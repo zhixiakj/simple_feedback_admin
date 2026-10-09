@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "title": "Feedback Admin",
+    "description": "Feedback management console for simple_feedback"
+  },
+  "common": {
+    "appTitle": "Feedback Admin",
+    "refresh": "Refresh",
+    "logout": "Sign out",
+    "loading": "Loading…",
+    "copy": "Copy",
+    "empty": "(empty)",
+    "language": "Language"
+  },
+  "home": {
+    "basedOn": "Based on the latest {count} items",
+    "basedOnTitle": "List and stats are based on the latest 1000 items",
+    "loadFailed": "Failed to load",
+    "credHint": "If you see credential/initialization errors, make sure firebase-adminsdk.json is placed in the project root (see README).",
+    "paginationSummary": "{total} items · Page {page} of {totalPages}",
+    "prevPage": "Previous",
+    "nextPage": "Next"
+  },
+  "login": {
+    "subtitle": "Enter the password to sign in",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "fallbackError": "Sign-in failed"
+  },
+  "stats": {
+    "total": "Total feedback",
+    "today": "New today",
+    "pending": "Pending",
+    "byType": "By type"
+  },
+  "filters": {
+    "searchPlaceholder": "Search content / email / user / device…",
+    "allTypes": "All types",
+    "allPlatforms": "All platforms",
+    "allStatuses": "All statuses",
+    "clear": "Clear"
+  },
+  "table": {
+    "time": "Time",
+    "type": "Type",
+    "status": "Status",
+    "content": "Content",
+    "platform": "Platform",
+    "source": "Source",
+    "contact": "Contact",
+    "empty": "No feedback matches the filters"
+  },
+  "detail": {
+    "title": "Feedback Detail",
+    "close": "Close",
+    "contentTitle": "Content",
+    "source": "Source",
+    "resolvedAt": "Resolved at",
+    "email": "Email",
+    "userId": "User ID",
+    "deviceId": "Device ID",
+    "docId": "Doc ID",
+    "contextTitle": "Context (sourceData)",
+    "extraFieldsTitle": "Other fields",
+    "imagesTitle": "Images",
+    "imageCount": "({count})",
+    "noImages": "No images",
+    "imageAlt": "Feedback image {index}",
+    "lightboxAlt": "Feedback image",
+    "markResolved": "Mark resolved",
+    "reopen": "Reopen",
+    "delete": "Delete",
+    "confirmHint": "Delete permanently? This cannot be undone",
+    "confirmDelete": "Confirm delete",
+    "cancel": "Cancel",
+    "actionFailed": "Action failed",
+    "deleteFailed": "Delete failed"
+  },
+  "badges": {
+    "open": "Pending",
+    "resolved": "Resolved"
+  },
+  "types": {
+    "bug": "Bug",
+    "suggestion": "Suggestion",
+    "other": "Other"
+  },
+  "errors": {
+    "unauthorized": "Not signed in or session expired",
+    "invalid_password": "Incorrect password",
+    "admin_password_missing": "ADMIN_PASSWORD is not configured. Set it in .env.local and restart the server.",
+    "not_found": "Feedback not found",
+    "read_failed": "Failed to read feedback",
+    "update_failed": "Failed to update status",
+    "delete_failed": "Failed to delete",
+    "invalid_status": "status must be either open or resolved",
+    "network_error": "Network error, please retry"
+  }
+}

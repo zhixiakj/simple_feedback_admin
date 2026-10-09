@@ -13,6 +13,7 @@ Tech stack: Next.js (App Router) + React + Tailwind CSS + firebase-admin. The Ad
 - 🖼️ Image previews: supports both the embedded-Blob mode and the Cloud Storage path mode, click to zoom
 - ✅ Mark resolved / reopen (writes `status` / `resolvedAt`, independent of the Flutter side)
 - 🗑️ Delete feedback (with confirmation)
+- 🌐 Bilingual UI (Chinese / English) via `next-intl`: the initial language follows the browser's `Accept-Language`, and the toggle in the top-right corner remembers your choice in a cookie
 
 ## Setup
 
@@ -48,6 +49,7 @@ Open http://localhost:3000 and log in with your password.
 - **Images load on demand.** Images in the detail drawer are fetched one by one via `/api/feedback/[id]/image?index=n` and are never sent along with the list.
 - **Storage mode.** If the Flutter side is configured with `FeedbackImageStorage.storage` (`imgs` stores paths), the bucket is derived as `<project_id>.appspot.com` by default; set `FIREBASE_STORAGE_BUCKET` if you use a non-default bucket.
 - **Status fields are admin-only.** `status` (open/resolved) and `resolvedAt` are written exclusively by this console; the client-side security rules of the Flutter app cannot read them, so the two sides never interfere.
+- **i18n without locale routes.** Translations live in `messages/zh.json` and `messages/en.json`; the locale is resolved per request in `i18n/request.ts` (`NEXT_LOCALE` cookie → `Accept-Language` header → fallback `zh`). API routes return machine-readable error codes (`{ error, detail }`) that the UI translates with the active language.
 
 ## Deployment (optional)
 

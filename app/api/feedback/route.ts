@@ -110,6 +110,6 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("[api/feedback] list failed:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: `读取反馈失败：${message}` }, { status: 500 });
+    return NextResponse.json({ error: "read_failed", detail: message }, { status: 500 });
   }
 }

@@ -18,15 +18,12 @@ function safeEqual(a: string, b: string): boolean {
 export async function POST(request: Request) {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) {
-    return NextResponse.json(
-      { error: "ADMIN_PASSWORD 未配置，请在 .env.local 中设置后重启" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "admin_password_missing" }, { status: 500 });
   }
 
   const body = (await request.json().catch(() => null)) as { password?: unknown } | null;
   if (!body || typeof body.password !== "string" || !safeEqual(body.password, expected)) {
-    return NextResponse.json({ error: "密码错误" }, { status: 401 });
+    return NextResponse.json({ error: "invalid_password" }, { status: 401 });
   }
 
   const response = NextResponse.json({ ok: true });

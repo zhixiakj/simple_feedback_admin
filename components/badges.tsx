@@ -1,7 +1,11 @@
-import { PLATFORM_LABELS, TYPE_LABELS } from "@/lib/types";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { PLATFORM_LABELS } from "@/lib/types";
 
 export function TypeBadge({ type }: { type: string }) {
-  const label = TYPE_LABELS[type] ?? type;
+  const t = useTranslations("types");
+  const label = t.has(type) ? t(type) : type;
   const styles: Record<string, string> = {
     bug: "bg-red-50 text-red-700 ring-red-200",
     suggestion: "bg-blue-50 text-blue-700 ring-blue-200",
@@ -19,13 +23,14 @@ export function TypeBadge({ type }: { type: string }) {
 }
 
 export function StatusBadge({ status }: { status: "open" | "resolved" }) {
+  const t = useTranslations("badges");
   return status === "open" ? (
     <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
-      待处理
+      {t("open")}
     </span>
   ) : (
     <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
-      已处理
+      {t("resolved")}
     </span>
   );
 }

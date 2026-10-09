@@ -2,15 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, LogOut, RefreshCw, TriangleAlert } from "lucide-react";
 import type { FeedbackListResponse } from "@/lib/types";
+import { apiErrorMessage, type ApiErrorBody } from "@/lib/api-error";
 import StatsCards from "@/components/StatsCards";
 import FilterBar, { type FilterState } from "@/components/FilterBar";
 import FeedbackTable from "@/components/FeedbackTable";
 import DetailDrawer from "@/components/DetailDrawer";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function HomePage() {
   const router = useRouter();
+  const t = useTranslations("home");
+  const tCommon = useTranslations("common");
+  const tErr = useTranslations("errors");
   const [data, setData] = useState<FeedbackListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,17 +40,21 @@ export default function HomePage() {
         router.replace("/login");
         return;
       }
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
+      const json = (await res.json().catch(() => null)) as ApiErrorBody;
+      if (!res.ok) {
+        if (reqId !== reqIdRef.current) return;
+        setError(apiErrorMessage(tErr, json, res.status));
+        return;
+      }
       if (reqId !== reqIdRef.current) return;
-      setData(json);
-    } catch (e) {
+      setData(json as FeedbackListResponse);
+    } catch {
       if (reqId !== reqIdRef.current) return;
-      setError(e instanceof Error ? e.message : String(e));
+      setError(tErr("network_error"));
     } finally {
       if (reqId === reqIdRef.current) setLoading(false);
     }
-  }, [filters, page, router]);
+  }, [filters, page, router, tErr]);
 
   useEffect(() => {
     load();
@@ -76,25 +86,26 @@ export default function HomePage() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-6">
       <header className="mb-5 flex items-center gap-3">
-        <h1 className="text-xl font-semibold">反馈管理后台</h1>
+        <h1 className="text-xl font-semibold">{tCommon("appTitle")}</h1>
         <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">
           Firestore: feedback
         </span>
         {data && (
-          <span className="text-xs text-gray-400" title="列表与统计基于最近 1000 条">
-            基于最近 {data.stats.scanned} 条
+          <span className="text-xs text-gray-400" title={t("basedOnTitle")}>
+            {t("basedOn", { count: data.stats.scanned })}
           </span>
         )}
         <div className="ml-auto flex items-center gap-1">
+          <LanguageSwitcher />
           <button
             type="button"
             onClick={load}
             disabled={loading}
             className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
-            title="刷新"
+            title={tCommon("refresh")}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            刷新
+            {tCommon("refresh")}
           </button>
           <button
             type="button"
@@ -102,7 +113,7 @@ export default function HomePage() {
             className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
           >
             <LogOut className="h-4 w-4" />
-            登出
+            {tCommon("logout")}
           </button>
         </div>
       </header>
@@ -114,11 +125,9 @@ export default function HomePage() {
           <div className="flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">
             <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
-              <p className="font-medium">加载失败</p>
+              <p className="font-medium">{t("loadFailed")}</p>
               <p className="mt-0.5 break-all">{error}</p>
-              <p className="mt-1 text-xs text-red-600/80">
-                若提示凭据/初始化错误，请确认项目根目录已放置 firebase-adminsdk.json（见 README）。
-              </p>
+              <p className="mt-1 text-xs text-red-600/80">{t("credHint")}</p>
             </div>
           </div>
         )}
@@ -135,19 +144,17 @@ export default function HomePage() {
 
         {data && data.total > 0 && (
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>
-              共 {data.total} 条 · 第 {data.page} / {totalPages} 页
-            </span>
+            <span>{t("paginationSummary", { total: data.total, page: data.page, totalPages })}</span>
             <div className="flex items-center gap-1">
               <PaginationButton disabled={page <= 1 || loading} onClick={() => setPage((p) => p - 1)}>
                 <ChevronLeft className="h-4 w-4" />
-                上一页
+                {t("prevPage")}
               </PaginationButton>
               <PaginationButton
                 disabled={page >= totalPages || loading}
                 onClick={() => setPage((p) => p + 1)}
               >
-                下一页
+                {t("nextPage")}
                 <ChevronRight className="h-4 w-4" />
               </PaginationButton>
             </div>

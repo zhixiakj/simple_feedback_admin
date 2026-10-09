@@ -41,11 +41,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const doc = await adminDb.collection("feedback").doc(id).get();
     if (!doc.exists) {
-      return new NextResponse("反馈不存在", { status: 404 });
+      return new NextResponse("not_found", { status: 404 });
     }
     const imgs = doc.data()?.imgs;
     if (!Array.isArray(imgs) || index < 0 || index >= imgs.length) {
-      return new NextResponse("图片不存在", { status: 404 });
+      return new NextResponse("image_not_found", { status: 404 });
     }
 
     const item = imgs[index];
@@ -54,10 +54,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       // Storage 模式：imgs 存的是 Cloud Storage 路径
       const bucketName = getStorageBucketName();
       if (!bucketName) {
-        return new NextResponse(
-          "无法确定 Storage bucket：请在环境变量中配置 FIREBASE_STORAGE_BUCKET",
-          { status: 500 }
-        );
+        return new NextResponse("storage_bucket_missing", { status: 500 });
       }
       const [buffer] = await adminApp.storage().bucket(bucketName).file(item).download();
       bytes = new Uint8Array(buffer);
@@ -78,6 +75,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("[api/feedback/:id/image] failed:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return new NextResponse(`加载图片失败：${message}`, { status: 500 });
+    return new NextResponse(`read_failed: ${message}`, { status: 500 });
   }
 }

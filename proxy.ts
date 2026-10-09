@@ -8,7 +8,8 @@ export async function proxy(request: NextRequest) {
   }
 
   if (request.nextUrl.pathname.startsWith("/api")) {
-    return NextResponse.json({ error: "未登录或会话已过期" }, { status: 401 });
+    // 错误码由前端按语言翻译（lib/api-error.ts）
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const loginUrl = new URL("/login", request.url);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function ImageLightbox({
   src,
@@ -9,6 +10,8 @@ export default function ImageLightbox({
   src: string | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("detail");
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -27,7 +30,7 @@ export default function ImageLightbox({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
-        alt="反馈图片"
+        alt={t("lightboxAlt")}
         className="max-h-full max-w-full cursor-zoom-out object-contain"
         onClick={(e) => e.stopPropagation()}
       />

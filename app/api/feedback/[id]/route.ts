@@ -78,13 +78,13 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   try {
     const doc = await adminDb.collection("feedback").doc(id).get();
     if (!doc.exists) {
-      return NextResponse.json({ error: "反馈不存在" }, { status: 404 });
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
     return NextResponse.json(buildDetail(doc.id, doc.data()!));
   } catch (error) {
     console.error("[api/feedback/:id] get failed:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: `读取反馈失败：${message}` }, { status: 500 });
+    return NextResponse.json({ error: "read_failed", detail: message }, { status: 500 });
   }
 }
 
@@ -92,7 +92,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const body = (await request.json().catch(() => null)) as { status?: unknown } | null;
   if (!body || (body.status !== "open" && body.status !== "resolved")) {
-    return NextResponse.json({ error: "status 必须为 open 或 resolved" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_status" }, { status: 400 });
   }
 
   try {
@@ -105,7 +105,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("[api/feedback/:id] patch failed:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: `更新状态失败：${message}` }, { status: 500 });
+    return NextResponse.json({ error: "update_failed", detail: message }, { status: 500 });
   }
 }
 
@@ -117,6 +117,6 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("[api/feedback/:id] delete failed:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: `删除失败：${message}` }, { status: 500 });
+    return NextResponse.json({ error: "delete_failed", detail: message }, { status: 500 });
   }
 }

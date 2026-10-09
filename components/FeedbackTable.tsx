@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { FileImage } from "lucide-react";
 import type { FeedbackListItem } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
@@ -14,18 +15,21 @@ export default function FeedbackTable({
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
+  const t = useTranslations("table");
+  const tCommon = useTranslations("common");
+
   return (
     <div className="overflow-hidden rounded-xl bg-white ring-1 ring-gray-200">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
-            <th className="px-4 py-2.5 font-medium">时间</th>
-            <th className="px-4 py-2.5 font-medium">类型</th>
-            <th className="px-4 py-2.5 font-medium">状态</th>
-            <th className="px-4 py-2.5 font-medium">内容</th>
-            <th className="px-4 py-2.5 font-medium">平台</th>
-            <th className="px-4 py-2.5 font-medium">来源</th>
-            <th className="px-4 py-2.5 font-medium">联系方式</th>
+            <th className="px-4 py-2.5 font-medium">{t("time")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("type")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("status")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("content")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("platform")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("source")}</th>
+            <th className="px-4 py-2.5 font-medium">{t("contact")}</th>
           </tr>
         </thead>
         <tbody>
@@ -48,7 +52,7 @@ export default function FeedbackTable({
               </td>
               <td className="max-w-md px-4 py-2.5">
                 <p className="truncate text-gray-900" title={item.content}>
-                  {item.content || "（空）"}
+                  {item.content || tCommon("empty")}
                 </p>
               </td>
               <td className="px-4 py-2.5">
@@ -68,7 +72,7 @@ export default function FeedbackTable({
       {items.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-16 text-gray-400">
           <FileImage className="h-8 w-8" />
-          <p className="text-sm">没有符合条件的反馈</p>
+          <p className="text-sm">{t("empty")}</p>
         </div>
       )}
     </div>

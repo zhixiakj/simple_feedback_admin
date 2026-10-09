@@ -46,11 +46,8 @@ export interface FeedbackListResponse {
   stats: FeedbackStats;
 }
 
-export const TYPE_LABELS: Record<string, string> = {
-  bug: "Bug",
-  suggestion: "建议",
-  other: "其他",
-};
+/** 反馈类型的稳定展示顺序，标签文案见 messages/*.json 的 types 命名空间 */
+export const TYPE_KEYS = ["bug", "suggestion", "other"] as const;
 
 export const PLATFORM_LABELS: Record<string, string> = {
   ios: "iOS",

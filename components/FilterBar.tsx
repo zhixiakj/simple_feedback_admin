@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search, X } from "lucide-react";
-import { PLATFORM_LABELS, TYPE_LABELS } from "@/lib/types";
+import { PLATFORM_LABELS, TYPE_KEYS } from "@/lib/types";
 
 export interface FilterState {
   type: string;
@@ -18,6 +19,10 @@ export default function FilterBar({
   filters: FilterState;
   onChange: (filters: FilterState) => void;
 }) {
+  const t = useTranslations("filters");
+  const tTypes = useTranslations("types");
+  const tBadges = useTranslations("badges");
+
   // 关键词本地防抖，停止输入 400ms 后才上抛触发请求
   const [qInput, setQInput] = useState(filters.q);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -50,7 +55,7 @@ export default function FilterBar({
           type="search"
           value={qInput}
           onChange={(e) => handleQChange(e.target.value)}
-          placeholder="搜索内容 / 邮箱 / 用户 / 设备…"
+          placeholder={t("searchPlaceholder")}
           className="w-64 rounded-lg border border-gray-300 bg-white py-1.5 pl-8 pr-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
       </div>
@@ -58,22 +63,22 @@ export default function FilterBar({
       <Select
         value={filters.type}
         onChange={(v) => onChange({ ...filters, type: v })}
-        placeholder="全部类型"
-        options={Object.entries(TYPE_LABELS)}
+        placeholder={t("allTypes")}
+        options={TYPE_KEYS.map((key) => [key, tTypes(key)] as [string, string])}
       />
       <Select
         value={filters.platform}
         onChange={(v) => onChange({ ...filters, platform: v })}
-        placeholder="全部平台"
+        placeholder={t("allPlatforms")}
         options={Object.entries(PLATFORM_LABELS)}
       />
       <Select
         value={filters.status}
         onChange={(v) => onChange({ ...filters, status: v })}
-        placeholder="全部状态"
+        placeholder={t("allStatuses")}
         options={[
-          ["open", "待处理"],
-          ["resolved", "已处理"],
+          ["open", tBadges("open")],
+          ["resolved", tBadges("resolved")],
         ]}
       />
 
@@ -84,7 +89,7 @@ export default function FilterBar({
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
         >
           <X className="h-4 w-4" />
-          清空
+          {t("clear")}
         </button>
       )}
     </div>
