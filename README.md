@@ -1,59 +1,59 @@
 # simple_feedback_admin
 
-[simple_feedback](../simple_feedback) Flutter 组件的用户反馈管理后台。读取 Firestore `feedback` collection，支持查看、筛选、搜索、标记处理状态、删除反馈和图片预览。
+Admin console for user feedback submitted by the [simple_feedback](../simple_feedback) Flutter package. Reads the Firestore `feedback` collection with support for viewing, filtering, searching, triage, deletion, and image previews.
 
-技术栈：Next.js (App Router) + React + Tailwind CSS + firebase-admin（Admin SDK 绕过客户端只写规则，可读可写）。
+Tech stack: Next.js (App Router) + React + Tailwind CSS + firebase-admin. The Admin SDK bypasses the client-side write-only security rules, so the console can read and update feedback documents.
 
-## 功能
+## Features
 
-- 🔐 密码登录（`ADMIN_PASSWORD`），middleware 保护所有页面与 API
-- 📊 统计概览：总数、今日新增、待处理、按类型分布
-- 🔍 筛选（类型 / 平台 / 状态）+ 关键词搜索（内容、邮箱、用户 ID、设备 ID、来源）
-- 📋 列表分页 + 点击查看详情（右侧抽屉）
-- 🖼️ 图片预览：支持内嵌 Blob 模式和 Cloud Storage 路径模式，可放大查看
-- ✅ 标记已处理 / 重新打开（写入 `status` / `resolvedAt` 字段，不影响 Flutter 端）
-- 🗑️ 删除反馈（二次确认）
+- 🔐 Password login (`ADMIN_PASSWORD`); a proxy middleware guards every page and API route
+- 📊 Stats overview: total, today's new, pending, and counts by type
+- 🔍 Filters (type / platform / status) + keyword search across content, email, user ID, device ID, and source
+- 📋 Paginated list with a detail drawer
+- 🖼️ Image previews: supports both the embedded-Blob mode and the Cloud Storage path mode, click to zoom
+- ✅ Mark resolved / reopen (writes `status` / `resolvedAt`, independent of the Flutter side)
+- 🗑️ Delete feedback (with confirmation)
 
-## 首次配置
+## Setup
 
-### 1. 放置 Firebase service account 密钥
+### 1. Add the Firebase service account key
 
-Firebase 控制台 → 项目设置 → 服务账号 → 「生成新的私钥」，把下载的 JSON 保存为项目根目录的 `firebase-adminsdk.json`。
+Firebase Console → Project settings → Service accounts → "Generate new private key", then save the downloaded JSON as `firebase-adminsdk.json` in the project root.
 
-该文件已在 `.gitignore` 中，不会被提交。也可以改用环境变量 `FIREBASE_SERVICE_ACCOUNT` 直接传入 JSON 字符串（部署到 Vercel 等平台时推荐）。
+The file is already gitignored. Alternatively, set the `FIREBASE_SERVICE_ACCOUNT` environment variable to the JSON string directly (recommended when deploying to Vercel or similar platforms).
 
-### 2. 配置环境变量
+### 2. Configure environment variables
 
-复制 `.env.example` 为 `.env.local` 并修改：
+Copy `.env.example` to `.env.local` and fill in:
 
 ```bash
 cp .env.example .env.local
 ```
 
-- `ADMIN_PASSWORD`：登录后台的密码
-- `AUTH_SECRET`：session 签名密钥，用 `openssl rand -hex 32` 生成
+- `ADMIN_PASSWORD`: password to log into the console
+- `AUTH_SECRET`: key for signing the session cookie, generate with `openssl rand -hex 32`
 
-### 3. 安装依赖并启动
+### 3. Install and run
 
 ```bash
 npm install
 npm run dev
 ```
 
-打开 http://localhost:3000，输入密码登录即可。
+Open http://localhost:3000 and log in with your password.
 
-## 说明
+## Notes
 
-- **列表与统计基于最近 1000 条**：为支持关键词子串搜索（Firestore 原生不支持）并避免复合索引，服务端一次拉取最近 1000 条（排除 `imgs` 大字段）在内存中筛选和统计，界面上有标注。
-- **图片按需加载**：详情里的图片通过 `/api/feedback/[id]/image?index=n` 逐张加载，不随列表传输。
-- **Storage 模式**：若 Flutter 端配置了 `FeedbackImageStorage.storage`（`imgs` 存路径），默认按 `<project_id>.appspot.com` 推导 bucket；非默认 bucket 时请设置 `FIREBASE_STORAGE_BUCKET`。
-- **状态字段是后台新增的**：`status`（open/resolved）和 `resolvedAt` 仅由本后台写入，Flutter 端的安全规则禁止客户端读取，互不影响。
+- **List and stats scan the most recent 1000 documents.** To support keyword substring search (not natively supported by Firestore) and avoid composite indexes, the server fetches the most recent 1000 docs (projected without the heavy `imgs` field) and filters/aggregates in memory. The UI shows this scope.
+- **Images load on demand.** Images in the detail drawer are fetched one by one via `/api/feedback/[id]/image?index=n` and are never sent along with the list.
+- **Storage mode.** If the Flutter side is configured with `FeedbackImageStorage.storage` (`imgs` stores paths), the bucket is derived as `<project_id>.appspot.com` by default; set `FIREBASE_STORAGE_BUCKET` if you use a non-default bucket.
+- **Status fields are admin-only.** `status` (open/resolved) and `resolvedAt` are written exclusively by this console; the client-side security rules of the Flutter app cannot read them, so the two sides never interfere.
 
-## 部署（可选）
+## Deployment (optional)
 
-以 Vercel 为例：
+Taking Vercel as an example:
 
-1. 环境变量设置 `ADMIN_PASSWORD`、`AUTH_SECRET`、`FIREBASE_SERVICE_ACCOUNT`（service account JSON 的完整字符串）；
-2. 如需 Storage 图片预览，再设置 `FIREBASE_STORAGE_BUCKET`。
+1. Set the environment variables `ADMIN_PASSWORD`, `AUTH_SECRET`, and `FIREBASE_SERVICE_ACCOUNT` (the full service account JSON as a string);
+2. If you need Storage image previews, also set `FIREBASE_STORAGE_BUCKET`.
 
-生产环境 cookie 自动启用 `secure`，必须通过 HTTPS 访问。
+Cookies automatically get the `secure` flag in production, so the site must be served over HTTPS.
